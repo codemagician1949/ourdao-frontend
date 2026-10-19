@@ -7,8 +7,16 @@
  */
 import type { ReactNode } from 'react'
 import { useWallet } from '@/lib/wallet'
-import { formatStellarAddress } from '@/lib/stellar'
+import { formatStellarAddress, getAddressUrl } from '@/lib/stellar'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Copy, ExternalLink, LogOut } from 'lucide-react'
 
 interface CustomRenderProps {
   account?: { address: string; displayName: string }
@@ -23,10 +31,36 @@ function ConnectButton() {
   const { address, isConnected, connect, disconnect, connecting } = useWallet()
 
   if (isConnected && address) {
+    const explorerUrl = getAddressUrl(address)
     return (
-      <Button variant="outline" onClick={disconnect} title={address}>
-        {formatStellarAddress(address)}
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" title={address}>
+            {formatStellarAddress(address)}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            onSelect={() => navigator.clipboard.writeText(address)}
+          >
+            <Copy className="mr-2 h-4 w-4" />
+            Copy address
+          </DropdownMenuItem>
+          {explorerUrl && (
+            <DropdownMenuItem asChild>
+              <a href={explorerUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                View on explorer
+              </a>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={disconnect} className="text-destructive focus:text-destructive">
+            <LogOut className="mr-2 h-4 w-4" />
+            Disconnect
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
   return (
