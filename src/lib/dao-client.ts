@@ -522,6 +522,9 @@ export const daoRead = {
   // "fully voted".
   hasVoted: (k: 'Loan' | 'Treasury', proposalId: number, voter: string): Promise<boolean | null> =>
     read('has_voted', { kind: kind(k), proposal_id: proposalId, voter }),
+  getDaoSummary: (): Promise<Record<string, unknown> | null> => read('get_dao_summary'),
+  getMemberOverview: (member: string): Promise<Record<string, unknown> | null> =>
+    read('get_member_overview', { member }),
 }
 
 /** Standard SEP-41 token contract reads. */
